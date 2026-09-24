@@ -360,14 +360,14 @@ body{
 /* палітра: 6 піксельних «кружечків» у ряд */
 .palette{
   display: flex;
-  justify-content: space-between;
-  gap: .5em;
+  gap: .45em;
   margin: .6em 0 0;
   padding: 0;
   list-style: none;
 }
 .palette li{
-  flex: 1;
+  flex: none;
+  width: 2em;   /* розмір кружечка */
   aspect-ratio: 1;
   background: var(--c);
   /* кружечок зі «сходинками», як у піксель-арті */
@@ -504,7 +504,7 @@ body{
     <div class="popup-body">
       <button class="popup-close" type="button" aria-label="Закрити">✕</button>
       <h2 class="popup-title" id="popup-info-title">Вас запрошено на вечірку до жаби</h2>
-      <p class="popup-when">03.10 на 13:00<br>Квартира 1016</p>
+      <p class="popup-when">Дата: 03.10.2026<br>Час: з 13:00<br>Квартира: 1016</p>
 
       <ul class="popup-list">
         <li>Дрес-код — «вечірка у відьми на болоті»: відтінки зеленого, темно-рожевого, фіолетового та кремового.
