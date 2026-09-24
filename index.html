@@ -312,12 +312,12 @@ body{
   padding: 0;
   list-style: none;
 }
-.popup-list li{
+.popup-list > li{
   position: relative;
   margin: 0 0 .7em;
   padding-left: 1.1em;
 }
-.popup-list li::before{
+.popup-list > li::before{
   content: "";
   position: absolute;
   left: .15em;
@@ -352,7 +352,7 @@ body{
   display: flex;
   justify-content: space-between;
   gap: .5em;
-  margin: 1em 0 0;
+  margin: .6em 0 0;
   padding: 0;
   list-style: none;
 }
@@ -496,21 +496,21 @@ body{
       <h2 class="popup-title" id="popup-info-title">Вас запрошено на вечірку до жаби</h2>
 
       <ul class="popup-list">
-        <li>Дрес-код — «вечірка у відьми на болоті»: відтінки зеленого, темно-рожевого, фіолетового та кремового. Знизу є орієнтовна палітра.</li>
+        <li>Дрес-код — «вечірка у відьми на болоті»: відтінки зеленого, темно-рожевого, фіолетового та кремового.
+          <!-- палітра: кольори міняй у style="--c:…" -->
+          <ul class="palette" aria-label="Орієнтовна палітра кольорів">
+            <li style="--c:#44064B" title="#44064B"></li>
+            <li style="--c:#600342" title="#600342"></li>
+            <li style="--c:#7C0046" title="#7C0046"></li>
+            <li style="--c:#BABC59" title="#BABC59"></li>
+            <li style="--c:#83910E" title="#83910E"></li>
+            <li style="--c:#556A07" title="#556A07"></li>
+          </ul>
+        </li>
         <li>Якщо таких кольорів немає — обов'язково якийсь аксесуар зеленого кольору (щось маленьке теж ок).</li>
         <li>Принести одну квітку, яка асоціюється зі мною.</li>
         <li>Обов'язково не забути гарний настрій.</li>
         <li>До зустрічі!</li>
-      </ul>
-
-      <!-- палітра: кольори міняй у style="--c:…" -->
-      <ul class="palette" aria-label="Орієнтовна палітра кольорів">
-        <li style="--c:#44064B" title="#44064B"></li>
-        <li style="--c:#600342" title="#600342"></li>
-        <li style="--c:#7C0046" title="#7C0046"></li>
-        <li style="--c:#BABC59" title="#BABC59"></li>
-        <li style="--c:#83910E" title="#83910E"></li>
-        <li style="--c:#556A07" title="#556A07"></li>
       </ul>
     </div>
   </dialog>
