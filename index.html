@@ -299,12 +299,31 @@ body{
 }
 .popup-title{
   margin: 0 1.6em .6em 0;
-  font-size: 1.5em;
+  font-size: 1.2em;
   font-weight: 400;
   line-height: 1.2;
   color: var(--popup-accent);
 }
-.popup p{ margin: 0 0 .7em; }
+/* пункти з піксельною «крапочкою» */
+.popup-list{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.popup-list li{
+  position: relative;
+  margin: 0 0 .7em;
+  padding-left: 1.1em;
+}
+.popup-list li::before{
+  content: "";
+  position: absolute;
+  left: .15em;
+  top: .55em;
+  width: .45em;
+  height: .45em;
+  background: var(--popup-accent);
+}
 
 .popup-close{
   position: absolute;
@@ -326,20 +345,23 @@ body{
   color: var(--popup-dark);
 }
 
-.popup-palette{
-  display: block;
-  width: 100%;
-  margin-top: 1em;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+/* палітра: 6 піксельних «кружечків» у ряд */
+.palette{
+  display: flex;
+  justify-content: space-between;
+  gap: .5em;
+  margin: 1em 0 0;
+  padding: 0;
+  list-style: none;
 }
-/* плейсхолдер палітри (видалиш, коли буде картинка) */
-.ph-palette{
-  margin-top: 1em;
-  padding: .8em;
-  border: .12em dashed rgba(243,234,211,.6);
-  text-align: center;
-  opacity: .75;
+.palette li{
+  flex: 1;
+  aspect-ratio: 1;
+  background: var(--c);
+  /* кружечок зі «сходинками», як у піксель-арті */
+  clip-path: polygon(30% 0, 70% 0, 70% 10%, 90% 10%, 90% 30%, 100% 30%, 100% 70%,
+    90% 70%, 90% 90%, 70% 90%, 70% 100%, 30% 100%, 30% 90%, 10% 90%, 10% 70%,
+    0 70%, 0 30%, 10% 30%, 10% 10%, 30% 10%);
 }
 
 /* =========================================================================
@@ -463,23 +485,31 @@ body{
     <img class="frame-2" src="img/pad-2.png" alt="">
   </div>
   <!-- ===================================================================
-       ВІКНО «お願いこと» — відкривається з латаття ❗
-       Кожен <p> — окремий абзац. Текст міняй прямо тут.
+       ВІКНО «Запрошення на вечірку» — відкривається з латаття ❗
+       Кожен <li> — окремий пункт. Текст міняй прямо тут.
        =================================================================== -->
   <dialog class="popup" id="popup-info" aria-labelledby="popup-info-title">
     <div class="popup-body">
       <button class="popup-close" type="button" aria-label="Закрити">✕</button>
-      <h2 class="popup-title" id="popup-info-title" lang="ja">お願いこと</h2>
+      <h2 class="popup-title" id="popup-info-title">Запрошення на вечірку</h2>
 
-      <p>Дрес-код — «вечірка у відьми на болоті»: відтінки зеленого, темно-рожевого, фіолетового та кремового. Знизу є орієнтовна палітра.</p>
-      <p>Якщо таких кольорів немає — обов'язково якийсь аксесуар зеленого кольору (щось маленьке теж ок).</p>
-      <p>Принести одну квітку, яка асоціюється зі мною.</p>
-      <p>Обов'язково не забути гарний настрій.</p>
-      <p>До зустрічі!</p>
+      <ul class="popup-list">
+        <li>Дрес-код — «вечірка у відьми на болоті»: відтінки зеленого, темно-рожевого, фіолетового та кремового. Знизу є орієнтовна палітра.</li>
+        <li>Якщо таких кольорів немає — обов'язково якийсь аксесуар зеленого кольору (щось маленьке теж ок).</li>
+        <li>Принести одну квітку, яка асоціюється зі мною.</li>
+        <li>Обов'язково не забути гарний настрій.</li>
+        <li>До зустрічі!</li>
+      </ul>
 
-      <!-- палітра: коли намалюєш — видали <div class="ph-palette"> і розкоментуй <img> -->
-      <!-- <img class="popup-palette" src="img/palette.png" alt="Орієнтовна палітра кольорів"> -->
-      <div class="ph-palette">тут буде палітра</div>
+      <!-- палітра: кольори міняй у style="--c:…" -->
+      <ul class="palette" aria-label="Орієнтовна палітра кольорів">
+        <li style="--c:#44064B" title="#44064B"></li>
+        <li style="--c:#600342" title="#600342"></li>
+        <li style="--c:#7C0046" title="#7C0046"></li>
+        <li style="--c:#BABC59" title="#BABC59"></li>
+        <li style="--c:#83910E" title="#83910E"></li>
+        <li style="--c:#556A07" title="#556A07"></li>
+      </ul>
     </div>
   </dialog>
 </main>
