@@ -301,8 +301,10 @@ body{
   margin: 0 1.6em .6em 0;
   font-size: 1.2em;
   font-weight: 400;
-  line-height: 1.2;
+  line-height: 1.3;
   color: var(--popup-accent);
+  /* «жирний» для піксельного шрифту: копія тексту зсунута на 1 піксель вправо */
+  text-shadow: .07em 0 0 currentColor;
 }
 /* пункти з піксельною «крапочкою» */
 .popup-list{
@@ -485,13 +487,13 @@ body{
     <img class="frame-2" src="img/pad-2.png" alt="">
   </div>
   <!-- ===================================================================
-       ВІКНО «Запрошення на вечірку» — відкривається з латаття ❗
+       ВІКНО «Вас запрошено на вечірку до жаби» — відкривається з латаття ❗
        Кожен <li> — окремий пункт. Текст міняй прямо тут.
        =================================================================== -->
   <dialog class="popup" id="popup-info" aria-labelledby="popup-info-title">
     <div class="popup-body">
       <button class="popup-close" type="button" aria-label="Закрити">✕</button>
-      <h2 class="popup-title" id="popup-info-title">Запрошення на вечірку</h2>
+      <h2 class="popup-title" id="popup-info-title">Вас запрошено на вечірку до жаби</h2>
 
       <ul class="popup-list">
         <li>Дрес-код — «вечірка у відьми на болоті»: відтінки зеленого, темно-рожевого, фіолетового та кремового. Знизу є орієнтовна палітра.</li>
