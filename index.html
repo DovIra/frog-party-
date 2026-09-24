@@ -306,6 +306,16 @@ body{
   /* «жирний» для піксельного шрифту: копія тексту зсунута на 1 піксель вправо */
   text-shadow: .07em 0 0 currentColor;
 }
+/* дата, час і квартира — одразу під заголовком */
+.popup-when{
+  margin: 0 0 .9em;
+  padding: .4em .6em;
+  background: var(--popup-dark);
+  font-size: 1.1em;
+  line-height: 1.4;
+  text-shadow: .07em 0 0 currentColor;
+}
+
 /* пункти з піксельною «крапочкою» */
 .popup-list{
   margin: 0;
@@ -494,6 +504,7 @@ body{
     <div class="popup-body">
       <button class="popup-close" type="button" aria-label="Закрити">✕</button>
       <h2 class="popup-title" id="popup-info-title">Вас запрошено на вечірку до жаби</h2>
+      <p class="popup-when">03.10 на 13:00<br>Квартира 1016</p>
 
       <ul class="popup-list">
         <li>Дрес-код — «вечірка у відьми на болоті»: відтінки зеленого, темно-рожевого, фіолетового та кремового.
