@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Birthday Party</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=DotGothic16&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================================
+   НАЛАШТУВАННЯ — все, що треба міняти, лежить тут
+   ========================================================================= */
+:root{
+  /* --- швидкість анімації (один цикл із двох кадрів) --------------------- */
+  --anim-frog: 1.5s;
+  --anim-pad:  2.6s;
+  --anim-title: 1.2s;
+
+  /* --- розміри елементів у % від ширини сцени ---------------------------- */
+  --frog-w:       29%;   /* жаба            (малювати 32×32) */
+  --pad-w:        21%;   /* латаття з річчю (малювати 32×32) — пікселі як у жаби */
+  --pad-decor-w:  12%;   /* порожнє латаття — рівно вдвічі менше за жабу */
+
+  /* --- кольори ------------------------------------------------------------ */
+  --bg-1:  #1e2029;   /* фон сцени */
+  --paper: #f4fffb;   /* текст */
+
+  /* --- вікно «お願いこと» ---------------------------------------------- */
+  --popup-bg:     #22302d;   /* фон вікна — болотний */
+  --popup-text:   #f3ead3;   /* текст — кремовий */
+  --popup-accent: #e0608f;   /* заголовок — рожевий */
+  --popup-line:   #f3ead3;   /* піксельна рамка */
+  --popup-dark:   #0e1214;   /* обвідка рамки */
+}
+
+/* =========================================================================
+   СЦЕНА — масштабується цілком, щоб завжди вміщатись в екран без прокрутки
+   ========================================================================= */
+*{ box-sizing: border-box; }
+
+html, body{
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--bg-1);   /* поля навколо сцени на широкому екрані */
+}
+
+body{
+  display: grid;
+  place-items: center;
+  font-family: 'Caveat', 'Segoe Script', cursive;
+  color: var(--paper);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stage{
+  /* сцена 3:4 — вписується і в вузький телефон, і в широкий монітор */
+  --stage-w: min(100vw, calc(100dvh * 3 / 4), 720px);
+  position: relative;
+  width: var(--stage-w);
+  aspect-ratio: 3 / 4;
+  /* усі шрифти всередині масштабуються разом зі сценою */
+  font-size: calc(var(--stage-w) / 26);
+  /* один піксель арту заголовка на екрані (1.1% ширини сцени) */
+  --title-pixel: calc(var(--stage-w) * 1.1 / 100);
+  /* Фон — просто колір. Якщо колись намалюєш свій (полотно 180×240,
+     пропорція 3:4), поклади його в img/bg.png і розкоментуй рядок нижче. */
+  background: var(--bg-1);
+  /* background: var(--bg-1) url("img/bg.png") center / 100% 100% no-repeat; */
+  image-rendering: pixelated;
+  overflow: hidden;
+}
+
+@supports not (height: 100dvh){
+  .stage{ --stage-w: min(100vw, calc(100vh * 3 / 4), 720px); }
+}
+
+/* =========================================================================
+   ЗАГОЛОВОК
+   ========================================================================= */
+.title{
+  position: absolute;
+  top: 4.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  width: 92%;
+  text-align: center;
+  font-size: 2.1em;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--paper);
+  text-shadow: 0 .06em 0 rgba(0,0,0,.28);
+  letter-spacing: .01em;
+}
+.title{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+}
+
+/* слово-картинка: --cols × --rows — розмір полотна в Piskel */
+.word{
+  position: relative;
+  flex: none;
+  width: calc(var(--title-pixel) * var(--cols));
+  height: calc(var(--title-pixel) * var(--rows));
+  /* --shift: зсув по вертикалі в пікселях арту (мінус — вгору) */
+  transform: translateY(calc(var(--title-pixel) * var(--shift, 0)));
+  /* --pull: відступ зліва в пікселях арту (мінус — ближче до попереднього слова) */
+  margin-left: calc(var(--title-pixel) * var(--pull, 0));
+  --speed: var(--anim-title);
+}
+.word img{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+.word .frame-1{ animation: showFrame1 var(--speed) var(--delay, 0s) infinite; }
+.word .frame-2{ animation: showFrame2 var(--speed) var(--delay, 0s) infinite; }
+
+.title u{
+  text-decoration: none;
+  border-bottom: .07em solid var(--paper);
+  padding-bottom: .04em;
+}
+
+/* підзаголовок: ім'я та дата. Поки порожній — впишеш пізніше. */
+.subtitle{
+  position: absolute;
+  top: 14.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  text-align: center;
+  font-size: .95em;
+  color: var(--paper);
+  opacity: .9;
+  text-shadow: 0 .05em 0 rgba(0,0,0,.22);
+}
+
+/* =========================================================================
+   СПРАЙТИ — контейнер під піксель-арт
+   ========================================================================= */
+.sprite{
+  position: absolute;
+  transform: translate(-50%, -50%);
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  aspect-ratio: 1 / 1;
+}
+
+/* картинки всередині спрайта */
+.sprite img{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;   /* щоб піксель був чіткий, а не розмазаний */
+  image-rendering: crisp-edges;
+}
+
+/* --- ВАРІАНТ А: два окремих PNG, CSS їх перемикає ----------------------- */
+.sprite .frame-1{ animation: showFrame1 var(--speed, 1s) var(--delay, 0s) infinite; }
+.sprite .frame-2{ animation: showFrame2 var(--speed, 1s) var(--delay, 0s) infinite; }
+@keyframes showFrame1{ 0%, 49.9%{ opacity: 1 } 50%, 100%{ opacity: 0 } }
+@keyframes showFrame2{ 0%, 49.9%{ opacity: 0 } 50%, 100%{ opacity: 1 } }
+
+/* --- третій кадр: показується при наведенні / натисканні ---------------- */
+.sprite .frame-hover{ opacity: 0; }
+.pad:hover .frame-hover,
+.pad:focus-visible .frame-hover,
+.pad:active .frame-hover{ opacity: 1; }
+.pad:hover:has(.frame-hover) :is(.frame-1, .frame-2),
+.pad:focus-visible:has(.frame-hover) :is(.frame-1, .frame-2),
+.pad:active:has(.frame-hover) :is(.frame-1, .frame-2){ animation: none; opacity: 0; }
+
+/* --- ВАРІАНТ В: спрайтшит із Piskel (два кадри в рядок) ----------------- */
+.sprite.sheet{
+  background-repeat: no-repeat;
+  background-size: 200% 100%;              /* 2 кадри в рядок */
+  image-rendering: pixelated;
+  animation: playSheet var(--speed, 1s) var(--delay, 0s) steps(2) infinite;
+}
+@keyframes playSheet{ from{ background-position: 0 0 } to{ background-position: -200% 0 } }
+
+/* --- плейсхолдер (видалиш, коли будуть картинки) ------------------------ */
+.ph{
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: .12em dashed rgba(255,255,255,.75);
+  border-radius: .3em;
+  background: rgba(255,255,255,.14);
+  font-size: 1.9em;
+  line-height: 1;
+  animation: phBob 1.4s var(--delay, 0s) steps(2) infinite;
+}
+.ph::after{
+  content: attr(data-size);
+  position: absolute;
+  bottom: -1.35em;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: .42em;
+  color: var(--paper);
+  opacity: .8;
+}
+@keyframes phBob{ from{ transform: translateY(0) } to{ transform: translateY(-4%) } }
+
+/* =========================================================================
+   ЛАТАТТЯ-ПОСИЛАННЯ
+   ========================================================================= */
+.pad{
+  display: block;
+  text-decoration: none;
+  color: var(--paper);
+  cursor: pointer;
+  /* палець має куди натиснути навіть на маленькому екрані */
+  min-width: 56px;
+  min-height: 56px;
+}
+.pad .label{
+  position: absolute;
+  top: 101%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: .78em;
+  font-weight: 700;
+  color: var(--paper);
+  text-shadow: 0 .06em .02em rgba(0,0,0,.4);
+}
+.pad:hover, .pad:focus-visible{
+  outline: none;
+  filter: brightness(1.12);
+}
+@media (hover: hover){
+  .pad{ transition: transform .12s ease-out; }
+  .pad:hover{ transform: translate(-50%, -54%); }
+}
+.pad:active{ transform: translate(-50%, -47%); }
+
+/* декоративне латаття — не клікається */
+.decor{ pointer-events: none; opacity: .95; }
+
+/* =========================================================================
+   ВІКНО (dialog) — піксельна рамка, піксельний шрифт
+   ========================================================================= */
+.popup{
+  --p: calc(var(--stage-w) * .8 / 100);   /* товщина «пікселя» рамки */
+  width: calc(var(--stage-w) * .84);
+  max-height: calc(var(--stage-w) * 4 / 3 * .82);
+  margin: auto;
+  padding: 0;
+  border: none;
+  overflow: visible;
+  background: var(--popup-bg);
+  color: var(--popup-text);
+  font-family: 'DotGothic16', monospace;
+  font-size: calc(var(--stage-w) / 34);
+  line-height: 1.5;
+  /* рамка зі «сходинками» в кутах: кремова лінія + темна обвідка */
+  box-shadow:
+    0 calc(var(--p) * -1) 0 0 var(--popup-line),
+    0 var(--p) 0 0 var(--popup-line),
+    calc(var(--p) * -1) 0 0 0 var(--popup-line),
+    var(--p) 0 0 0 var(--popup-line),
+    0 calc(var(--p) * -2) 0 0 var(--popup-dark),
+    0 calc(var(--p) * 2) 0 0 var(--popup-dark),
+    calc(var(--p) * -2) 0 0 0 var(--popup-dark),
+    calc(var(--p) * 2) 0 0 0 var(--popup-dark),
+    var(--p) var(--p) 0 0 var(--popup-dark),
+    calc(var(--p) * -1) var(--p) 0 0 var(--popup-dark),
+    var(--p) calc(var(--p) * -1) 0 0 var(--popup-dark),
+    calc(var(--p) * -1) calc(var(--p) * -1) 0 0 var(--popup-dark);
+}
+.popup::backdrop{ background: rgba(8, 10, 14, .72); }
+.popup[open]{ animation: popupIn .18s steps(3) both; }
+@keyframes popupIn{ from{ transform: scale(.85); opacity: 0 } to{ transform: none; opacity: 1 } }
+
+.popup-body{
+  position: relative;
+  max-height: inherit;
+  overflow-y: auto;
+  padding: 1.2em 1.3em 1.3em;
+}
+.popup-title{
+  margin: 0 1.6em .6em 0;
+  font-size: 1.5em;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--popup-accent);
+}
+.popup p{ margin: 0 0 .7em; }
+
+.popup-close{
+  position: absolute;
+  top: .5em;
+  right: .5em;
+  width: 1.8em;
+  height: 1.8em;
+  padding: 0;
+  border: none;
+  background: var(--popup-dark);
+  color: var(--popup-text);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+.popup-close:hover, .popup-close:focus-visible{
+  outline: none;
+  background: var(--popup-accent);
+  color: var(--popup-dark);
+}
+
+.popup-palette{
+  display: block;
+  width: 100%;
+  margin-top: 1em;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+/* плейсхолдер палітри (видалиш, коли буде картинка) */
+.ph-palette{
+  margin-top: 1em;
+  padding: .8em;
+  border: .12em dashed rgba(243,234,211,.6);
+  text-align: center;
+  opacity: .75;
+}
+
+/* =========================================================================
+   ДОСТУПНІСТЬ: якщо в системі вимкнена анімація — не блимаємо
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce){
+  .sprite .frame-1, .sprite .frame-2, .sprite.sheet, .ph,
+  .word .frame-1, .word .frame-2{ animation: none; }
+  .sprite .frame-2, .word .frame-2{ opacity: 0; }
+  .popup[open]{ animation: none; }
+}
+</style>
+</head>
+
+<body>
+<main class="stage">
+  <h1 class="title" aria-label="Birthday Party">
+    <span class="word" style="--cols:40; --rows:14" aria-hidden="true">
+      <img class="frame-1" src="img/title-birthday-1.png" alt="">
+      <img class="frame-2" src="img/title-birthday-2.png" alt="">
+    </span>
+    <span class="word" style="--cols:28; --rows:14; --shift:-2; --pull:-2; --delay:-.3s" aria-hidden="true">
+      <img class="frame-1" src="img/title-party-1.png" alt="">
+      <img class="frame-2" src="img/title-party-2.png" alt="">
+    </span>
+  </h1>
+
+  <!-- Ім'я та дата — впиши між тегами, коли вирішиш -->
+  <p class="subtitle"></p>
+
+
+  <!-- ===================================================================
+       ЖАБА
+       Щоб вставити свій арт: видали <span class="ph">, розкоментуй
+       потрібний варіант нижче.
+       =================================================================== -->
+  <div class="sprite" style="--x:50%; --y:52%; --w:var(--frog-w); --speed:var(--anim-frog)" aria-hidden="true">
+    <img class="frame-1" src="img/frog-1.png" alt="">
+    <img class="frame-2" src="img/frog-2.png" alt="">
+  </div>
+
+
+  <!-- ===================================================================
+       ЛАТАТТЯ-ПОСИЛАННЯ (3 шт.)
+       href="#" — заміни на свої посилання
+       =================================================================== -->
+
+  <!-- 🎁 віш-лист -->
+  <a class="pad sprite" href="https://mywishlist.online/w/tt6bje/iras-wishlist" target="_blank" rel="noopener" aria-label="Віш-лист"
+     style="--x:73%; --y:33%; --w:var(--pad-w); --speed:var(--anim-pad)">
+    <img class="frame-1" src="img/pad-gift-1.png" alt="">
+    <img class="frame-2" src="img/pad-gift-2.png" alt="">
+    <img class="frame-hover" src="img/pad-gift-hover.png" alt="">
+  </a>
+
+  <!-- 🗺️ де зустрічаємось -->
+  <a class="pad sprite" href="https://maps.app.goo.gl/RMVa3C5qf5UzXnTV9?g_st=ic" target="_blank" rel="noopener" aria-label="Де зустрічаємось"
+     style="--x:21%; --y:45%; --w:var(--pad-w); --speed:var(--anim-pad); --delay:-.4s">
+    <img class="frame-1" src="img/pad-map-1.png" alt="">
+    <img class="frame-2" src="img/pad-map-2.png" alt="">
+  </a>
+
+  <!-- ❗ що принести і дрес-код — відкриває вікно #popup-info -->
+  <a class="pad sprite" href="#popup-info" data-popup="popup-info" aria-label="Що принести &amp; дрес-код"
+     style="--x:49%; --y:78%; --w:var(--pad-w); --speed:var(--anim-pad); --delay:-.8s">
+    <img class="frame-1" src="img/pad-info-1.png" alt="">
+    <img class="frame-2" src="img/pad-info-2.png" alt="">
+  </a>
+
+
+  <!-- ===================================================================
+       ДЕКОРАТИВНЕ ЛАТАТТЯ (порожнє, без посилань)
+       =================================================================== -->
+  <div class="sprite decor"
+       style="--x:50%; --y:23%; --w:var(--pad-decor-w); --speed:var(--anim-pad)"
+       aria-hidden="true">
+    <img class="frame-1" src="img/pad-1.png" alt="">
+    <img class="frame-2" src="img/pad-2.png" alt="">
+  </div>
+
+  <div class="sprite decor"
+       style="--x:81%; --y:61%; --w:var(--pad-decor-w); --speed:var(--anim-pad); --delay:-.5s"
+       aria-hidden="true">
+    <img class="frame-1" src="img/pad2-1.png" alt="">
+    <img class="frame-2" src="img/pad2-2.png" alt="">
+  </div>
+
+  <div class="sprite decor"
+       style="--x:19%; --y:68%; --w:var(--pad-decor-w); --speed:var(--anim-pad); --delay:-1s"
+       aria-hidden="true">
+    <img class="frame-1" src="img/pad-1.png" alt="">
+    <img class="frame-2" src="img/pad-2.png" alt="">
+  </div>
+
+  <!-- другий ряд декору — купками біля перших -->
+  <div class="sprite decor"
+       style="--x:38%; --y:28%; --w:var(--pad-decor-w); --speed:var(--anim-pad); --delay:-1.6s"
+       aria-hidden="true">
+    <img class="frame-1" src="img/pad2-1.png" alt="">
+    <img class="frame-2" src="img/pad2-2.png" alt="">
+  </div>
+
+  <div class="sprite decor"
+       style="--x:89%; --y:51%; --w:var(--pad-decor-w); --speed:var(--anim-pad); --delay:-2.1s"
+       aria-hidden="true">
+    <img class="frame-1" src="img/pad-1.png" alt="">
+    <img class="frame-2" src="img/pad-2.png" alt="">
+  </div>
+
+  <div class="sprite decor"
+       style="--x:10%; --y:59%; --w:var(--pad-decor-w); --speed:var(--anim-pad); --delay:-.8s"
+       aria-hidden="true">
+    <img class="frame-1" src="img/pad2-1.png" alt="">
+    <img class="frame-2" src="img/pad2-2.png" alt="">
+  </div>
+
+  <div class="sprite decor"
+       style="--x:71%; --y:70%; --w:var(--pad-decor-w); --speed:var(--anim-pad); --delay:-1.3s"
+       aria-hidden="true">
+    <img class="frame-1" src="img/pad-1.png" alt="">
+    <img class="frame-2" src="img/pad-2.png" alt="">
+  </div>
+  <!-- ===================================================================
+       ВІКНО «お願いこと» — відкривається з латаття ❗
+       Кожен <p> — окремий абзац. Текст міняй прямо тут.
+       =================================================================== -->
+  <dialog class="popup" id="popup-info" aria-labelledby="popup-info-title">
+    <div class="popup-body">
+      <button class="popup-close" type="button" aria-label="Закрити">✕</button>
+      <h2 class="popup-title" id="popup-info-title" lang="ja">お願いこと</h2>
+
+      <p>Дрес-код — «вечірка у відьми на болоті»: відтінки зеленого, темно-рожевого, фіолетового та кремового. Знизу є орієнтовна палітра.</p>
+      <p>Якщо таких кольорів немає — обов'язково якийсь аксесуар зеленого кольору (щось маленьке теж ок).</p>
+      <p>Принести одну квітку, яка асоціюється зі мною.</p>
+      <p>Обов'язково не забути гарний настрій.</p>
+      <p>До зустрічі!</p>
+
+      <!-- палітра: коли намалюєш — видали <div class="ph-palette"> і розкоментуй <img> -->
+      <!-- <img class="popup-palette" src="img/palette.png" alt="Орієнтовна палітра кольорів"> -->
+      <div class="ph-palette">тут буде палітра</div>
+    </div>
+  </dialog>
+</main>
+
+<script>
+/* латаття з data-popup="id" відкриває вікно з цим id */
+document.querySelectorAll('[data-popup]').forEach(function(link){
+  link.addEventListener('click', function(e){
+    var dlg = document.getElementById(link.dataset.popup);
+    if (!dlg || !dlg.showModal) return;   // старий браузер — просто перейде за якорем
+    e.preventDefault();
+    dlg.showModal();
+  });
+});
+/* закрити: хрестик або клік поза вікном (Esc браузер обробляє сам) */
+document.querySelectorAll('dialog.popup').forEach(function(dlg){
+  dlg.querySelector('.popup-close').addEventListener('click', function(){ dlg.close(); });
+  dlg.addEventListener('click', function(e){ if (e.target === dlg) dlg.close(); });
+});
+</script>
+</body>
+</html>
